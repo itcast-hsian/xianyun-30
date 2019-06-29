@@ -34,6 +34,7 @@
                 v-model="form.destCity"
                 ></el-autocomplete>
             </el-form-item>
+
             <el-form-item label="出发时间">
                 <!-- change 用户确认选择日期时触发 -->
                 <el-date-picker type="date" 
@@ -43,6 +44,7 @@
                 v-model="form.departDate">
                 </el-date-picker>
             </el-form-item>
+
             <el-form-item label="">
                 <el-button style="width:100%;" 
                 type="primary" 
@@ -59,6 +61,8 @@
 </template>
 
 <script>
+import moment from "moment";
+
 export default {
     data(){
         return {
@@ -81,7 +85,12 @@ export default {
     methods: {
         // tab切换时触发
         handleSearchTab(item, index){
-            
+            if(index == 1){
+                this.$confirm('业务暂时不提供往返', '提示', {
+                    confirmButtonText: '确定',
+                    type: 'warning'
+                })
+            }
         },
         
         // 触发的搜索建议
@@ -135,29 +144,78 @@ export default {
        
         // 出发城市下拉选择时触发
         handleDepartSelect(item) {
-            console.log(item)
+            this.form.departCity = item.value;
+            this.form.departCode = item.sort;
         },
 
         // 目标城市下拉选择时触发
         handleDestSelect(item) {
-            
+            this.form.destCity = item.value;
+            this.form.destCode = item.sort;
         },
 
         // 确认选择日期时触发
         handleDate(value){
-           
+           this.form.departDate =  moment(value).format("YYYY-MM-DD");
         },
 
         // 触发和目标城市切换时触发
         handleReverse(){
-            
+            const {departCity, departCode, destCity, destCode} = this.form;
+
+             // 到达城市传给出发城市
+            this.form.departCity = destCity;
+            this.form.departCode = destCode;
+
+            // 把出发城市传给到达城市
+            this.form.destCity = departCity;
+            this.form.destCode = departCode;
         },
 
         // 提交表单是触发
         handleSubmit(){
            
+            // 自定义表单验证
+            const rules = {
+                depart: {
+                    value: this.form.departCity,
+                    message: "请选择出发城市"
+                },
+                dest: {
+                    value: this.form.destCity,
+                    message: "请选择到达城市"
+                },
+                departDate: {
+                    value: this.form.departDate,
+                    message: "请选择出发时间"
+                }
+            };
+
+            // 验证变量哦，默认验证通过
+            let valid = true;
+
+            // 循环验证对象
+            Object.keys(rules).forEach(v => {
+                if(!valid) return;
+
+                // 如果有一项数据不存在
+                if(!rules[v].value){
+                    this.$message.warning(rules[v].message);
+                    // 验证不通过
+                    valid = false;
+                }
+            })
+
+            // 验证不通过，直接返回
+            if(!valid) return;
+
+            this.$router.push({
+                path: "/air/flights",
+                query: this.form
+            })
         }
     },
+
     mounted() {
        
     }

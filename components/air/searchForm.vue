@@ -101,7 +101,7 @@ export default {
 
             // 请求机票城市的接口
             this.$axios({
-                url: "http://157.122.54.189:9095/airs/city?name=" + value,
+                url: "/airs/city?name=" + value,
                 method: "GET",
             }).then(res => {
                 const {data} = res.data;
@@ -113,6 +113,10 @@ export default {
                         value: v.name.replace("市", "")
                     }
                 })
+
+                // 默认选中第一项
+                this.form.departCode = newData[0].sort;
+                this.form.departCity = newData[0].value;
 
                 cb(newData);
             })
@@ -125,7 +129,7 @@ export default {
 
             // 请求机票城市的接口
             this.$axios({
-                url: "http://157.122.54.189:9095/airs/city?name=" + value,
+                url: "/airs/city?name=" + value,
                 method: "GET",
             }).then(res => {
                 const {data} = res.data;
@@ -137,6 +141,10 @@ export default {
                         value: v.name.replace("市", "")
                     }
                 })
+
+                // 默认选中第一项
+                this.form.destCode = newData[0].sort;
+                this.form.destCity = newData[0].value;
 
                 cb(newData);
             })

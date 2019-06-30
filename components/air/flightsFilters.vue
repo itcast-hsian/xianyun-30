@@ -91,15 +91,30 @@ export default {
     methods: {
         // 选择机场时候触发
         handleAirport(value){
-            
+            // this.data是缓存的大数据对象，不会被修改
+            const arr = this.data.flights.filter(v => {
+                return v.org_airport_name === value;
+            });
+
+            // 触发修改机票列表的方法 setDataList
+            this.$emit("setDataList", arr);
         },
 
         // 选择出发时间时候触发
         handleFlightTimes(value){
-            
+            // this.data是缓存的大数据对象，不会被修改
+            const arr = this.data.flights.filter(v => {
+                // 开始的小时数字
+                const start = +v.dep_time.split(":")[0];
+
+                return value.from <= start && value.to > start;
+            });
+
+            // 触发修改机票列表的方法 setDataList
+            this.$emit("setDataList", arr);
         },
 
-         // 选择航空公司时候触发
+        // 选择航空公司时候触发
         handleCompany(value){
 
             // this.data是缓存的大数据对象，不会被修改
@@ -111,14 +126,25 @@ export default {
             this.$emit("setDataList", arr);
         },
 
-         // 选择机型时候触发
+        // 选择机型时候触发
         handleAirSize(value){
-           
+           // this.data是缓存的大数据对象，不会被修改
+            const arr = this.data.flights.filter(v => {
+                return v.plane_size === value;
+            });
+
+            // 触发修改机票列表的方法 setDataList
+            this.$emit("setDataList", arr);
         },
         
         // 撤销条件时候触发
         handleFiltersCancel(){
-            
+            this.airport = "";
+            this.flightTimes = "";
+            this.company = "";
+            this.airSize =  "";
+            // 触发修改机票列表的方法 setDataList
+            this.$emit("setDataList", this.data.flights);
         },
     }
 }

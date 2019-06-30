@@ -101,7 +101,14 @@ export default {
 
          // 选择航空公司时候触发
         handleCompany(value){
-            
+
+            // this.data是缓存的大数据对象，不会被修改
+            const arr = this.data.flights.filter(v => {
+                return v.airline_name === value;
+            });
+
+            // 触发修改机票列表的方法 setDataList
+            this.$emit("setDataList", arr);
         },
 
          // 选择机型时候触发

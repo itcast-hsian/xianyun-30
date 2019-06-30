@@ -5,7 +5,9 @@
             <!-- 顶部过滤列表 -->
             <div class="flights-content">
                 <!-- 过滤条件 -->
-                <FlightsFilters :data="flightsData"/>
+                <FlightsFilters 
+                :data="cacheFlightsData" 
+                @setDataList="setDataList"/>
                 
                 <!-- 航班头部布局 -->
                 <FlightsListHead/>
@@ -54,7 +56,14 @@ export default {
         return {
             // flightsData 航班的总数据
             flightsData: {
+                info: {},
+                options: {}
+            },
 
+            // 缓存对象，缓存对象一旦赋值之后不会被修改
+            cacheFlightsData: {
+                info: {},
+                options: {}
             },
 
             pageIndex: 1, // 默认的当前页
@@ -85,7 +94,16 @@ export default {
         },
 
         // 设置机票列表的数据
-        setDataList(){
+        setDataList(arr){
+            
+            if(arr){
+               this.flightsData.flights = arr;
+
+               // 初始化分页数据
+               this.pageIndex = 1;
+               this.total = arr.length;
+            }
+
             // 在总列表中截取出当前页的数据
             this.dataList = this.flightsData.flights.slice( 
                 (this.pageIndex - 1) * this.pageSize,
@@ -101,7 +119,10 @@ export default {
             url: "/airs",
             params: this.$route.query
         }).then(res => {
+            // 总数据，flightsData。flights是会修改的
             this.flightsData = res.data;
+            // 缓存数据，一旦被赋值之后不能修改
+            this.cacheFlightsData = {...res.data};
 
             this.dataList = this.flightsData.flights.slice(0, 5);
 

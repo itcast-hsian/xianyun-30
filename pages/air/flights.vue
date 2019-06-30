@@ -16,7 +16,7 @@
                 <!-- 航班信息 -->
                 <div>
                     <FlightsItem
-                    v-for="(item, index) in flightsData.flights"
+                    v-for="(item, index) in dataList"
                     :key="index"
                     :data="item"/>
                     
@@ -54,11 +54,15 @@ export default {
     data(){
         return {
             // flightsData 航班的总数据
-            flightsData: {},
+            flightsData: {
+
+            },
 
             pageIndex: 1, // 默认的当前页
             pageSize: 5, // 默认的条数
             total:0, // 默认的总条数
+
+            dataList: [], // 存当前页的数据
         }
     },
 
@@ -70,12 +74,23 @@ export default {
     methods: {
         // 切换条数时候触发
         handleSizeChange(value){
-
+            this.pageSize = value;
+            this.setDataList();
         },
 
         // 切换页数时候触发
         handleCurrentChange(value){
+            this.pageIndex = value;
+            this.setDataList();
+        },
 
+        // 设置机票列表的数据
+        setDataList(){
+            // 在总列表中截取出当前页的数据
+            this.dataList = this.flightsData.flights.slice( 
+                (this.pageIndex - 1) * this.pageSize,
+                this.pageIndex * this.pageSize
+            )
         }
     },
 
@@ -87,6 +102,10 @@ export default {
             params: this.$route.query
         }).then(res => {
             this.flightsData = res.data;
+
+            this.dataList = this.flightsData.flights.slice(0, 5);
+
+            this.total = this.flightsData.total;
         })
     }
 }

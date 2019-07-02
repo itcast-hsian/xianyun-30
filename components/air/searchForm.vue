@@ -220,7 +220,14 @@ export default {
             this.$router.push({
                 path: "/air/flights",
                 query: this.form
-            })
+            });
+
+            // 先获取本地的列表
+            const localAirs = JSON.parse(localStorage.getItem("airs") || `[]`);
+
+            // 把当前表单的值保存到本地
+            localAirs.unshift(this.form);
+            localStorage.setItem("airs", JSON.stringify(localAirs) )
         }
     },
 

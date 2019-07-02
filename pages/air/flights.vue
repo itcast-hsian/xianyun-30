@@ -39,9 +39,7 @@
             </div>
 
             <!-- 侧边栏 -->
-            <div class="aside">
-                <!-- 侧边栏组件 -->
-            </div>
+            <FlightsAside/>
         </el-row>
     </section>
 </template>
@@ -51,6 +49,7 @@
 import FlightsListHead from "@/components/air/flightsListHead.vue"
 import FlightsItem from "@/components/air/flightsItem.vue"
 import FlightsFilters from "@/components/air/flightsFilters.vue"
+import FlightsAside from "@/components/air/flightsAside.vue"
 
 export default {
     data(){
@@ -78,7 +77,17 @@ export default {
     components: {
         FlightsListHead,
         FlightsItem,
-        FlightsFilters
+        FlightsFilters,
+        FlightsAside
+    },
+
+    // watch是可以监听组件下所有属性
+    watch: {
+        $route(){
+            // console.log(this.$route.query)
+            // 请求机票列表
+            this.getData();
+        }
     },
 
     methods: {
@@ -112,25 +121,33 @@ export default {
                 (this.pageIndex - 1) * this.pageSize,
                 this.pageIndex * this.pageSize
             )
+        },
+
+        // 获取列表的数据
+        getData(){
+            // 请求机票列表
+            this.$axios({
+                url: "/airs",
+                params: this.$route.query
+            }).then(res => {
+                // 总数据，flightsData。flights是会修改的
+                this.flightsData = res.data;
+                // 缓存数据，一旦被赋值之后不能修改
+                this.cacheFlightsData = {...res.data};
+
+                this.dataList = this.flightsData.flights.slice(0, 5);
+
+                // 初始化分页数据
+                this.total = this.flightsData.total;
+                this.pageIndex = 1;
+            })
         }
     },
 
     mounted(){
         
         // 请求机票列表
-        this.$axios({
-            url: "/airs",
-            params: this.$route.query
-        }).then(res => {
-            // 总数据，flightsData。flights是会修改的
-            this.flightsData = res.data;
-            // 缓存数据，一旦被赋值之后不能修改
-            this.cacheFlightsData = {...res.data};
-
-            this.dataList = this.flightsData.flights.slice(0, 5);
-
-            this.total = this.flightsData.total;
-        })
+        this.getData();
     }
 }
 </script>

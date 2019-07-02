@@ -4,6 +4,7 @@
 
             <!-- 顶部过滤列表 -->
             <div class="flights-content">
+
                 <!-- 过滤条件 -->
                 <FlightsFilters 
                 :data="cacheFlightsData" 
@@ -94,6 +95,8 @@ export default {
         },
 
         // 设置机票列表的数据
+        // 给当前页面使用，没有传参数
+        // 在过滤组件中调用时候会传过滤后的数组
         setDataList(arr){
             
             if(arr){

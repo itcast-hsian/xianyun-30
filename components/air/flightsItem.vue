@@ -51,7 +51,8 @@
                         <el-col :span="3" class="choose-button">
                             <el-button 
                             type="warning" 
-                            size="mini">
+                            size="mini"
+                            @click="handleToOrder(item)">
                             选定
                             </el-button>
                             <p>剩余：{{item.discount}}</p>
@@ -108,6 +109,16 @@ export default {
         // 切换隐藏座位信息
         handleShow(){
             this.isShow = !this.isShow;
+        },
+        // 跳转到订单页
+        handleToOrder(item){
+            this.$router.push({
+                path: "/air/order",
+                query: {
+                    id: this.data.id,
+                    seat_xid: item.seat_xid
+                }
+            })
         }
     }
 }

@@ -33,8 +33,42 @@ import QRCode from "qrcode";
 export default {
     data(){
         return {
-            order: {}
+            order: {},
+
+            // 检查付款的定时器对象
+            timer: null
         }
+    },
+
+    methods: {
+        // 检测付款结果
+        isPay(){
+            return this.$axios({
+                url: "/airorders/checkpay",
+                method: "POST",
+                data: {
+                    id: this.$route.query.id,
+                    nonce_str: this.order.price,
+                    out_trade_no: this.order.orderNo
+                },
+                headers: {
+                    Authorization: `Bearer ${this.$store.state.user.userInfo.token}`
+                }
+            }).then(res => {
+                const {statusTxt} = res.data;
+
+                if(statusTxt == "支付完成"){
+                    return true;
+                }else{
+                    return false;
+                }
+            })
+        },
+    },
+
+    destroyed(){
+        // 当页面离开后停止定时器
+        clearInterval(this.timer);
     },
 
     mounted(){
@@ -62,6 +96,18 @@ export default {
                 QRCode.toCanvas(stage, this.order.payInfo.code_url, {
                     width: 200
                 }); 
+
+                // 判断当前付款是否成功
+                this.timer = setInterval(async () => {
+                    const isPay = await this.isPay();
+
+                    if(isPay){
+                        this.$message.success("付款成功");
+                        clearInterval(this.timer);
+                        return;
+                    }
+                }, 3000);
+                
             });
         }, 100);
     }

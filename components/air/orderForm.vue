@@ -85,6 +85,8 @@
                 <el-button type="warning" class="submit" @click="handleSubmit">提交订单</el-button>
             </div>
         </div>
+
+        <input type="hidden" :value="allPrice"/>
     </div>
 </template>
 
@@ -108,7 +110,31 @@ export default {
             captcha: "",         // 手机验证码
 
             // 机票信息的总数据
-            infoData: {},
+            infoData: {
+                seat_infos: {}
+            },
+        }
+    },
+
+    computed: {
+        allPrice(){
+            let price = 0;
+
+            // 机票的单价
+            price += this.infoData.seat_infos.org_settle_price;
+
+            // 燃油费
+            price += this.infoData.airport_tax_audlet;
+
+            // 保险
+            price += 30 * this.insurances.length;
+
+            // 乘机人数量
+            price *= this.users.length;
+
+            this.$emit('setAllPrice', price)
+            
+            return price;
         }
     },
 
@@ -194,6 +220,9 @@ export default {
             }
         }).then(res => {
             this.infoData = res.data;
+
+            // 把值传递给父组件
+            this.$emit("setInfoData", this.infoData);
         })
     }
 }

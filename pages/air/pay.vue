@@ -2,7 +2,7 @@
     <div class="container">
         <div class="main">
             <div class="pay-title">
-                支付总金额 <span class="pay-price">￥ 1000</span>
+                支付总金额 <span class="pay-price">￥ {{order.price}}</span>
             </div>
             <div class="pay-main">
                 <h4>微信支付</h4>
@@ -13,6 +13,7 @@
                     <div class="qrcode">
                         <!-- 二维码 -->
                         <canvas id="qrcode-stage"></canvas>
+
                         <p>请使用微信扫一扫</p>
                         <p>扫描二维码支付</p>
                     </div>
@@ -26,7 +27,16 @@
 </template>
 
 <script>
+// 生成二维码的包
+import QRCode from "qrcode";
+
 export default {
+    data(){
+        return {
+            order: {}
+        }
+    },
+
     mounted(){
         // 因为本地的读取的时间是比组件加载慢，需要延时执行
         setTimeout(() =>{
@@ -37,7 +47,21 @@ export default {
                     Authorization: `Bearer ${this.$store.state.user.userInfo.token}`
                 }
             }).then(res => {
-                console.log(res.data)
+                // console.log(res.data)
+                this.order = res.data;
+                // 价格保留两位小数点
+                this.order.price = Number(this.order.price).toFixed(2);
+
+                // 生成二维码到canvas
+                const stage = document.querySelector("#qrcode-stage");
+
+                // 调用qrcode包生成二维码
+                // stage: canvas的dom元素
+                // url: 付款的链接
+                // 配置：配置宽高
+                QRCode.toCanvas(stage, this.order.payInfo.code_url, {
+                    width: 200
+                }); 
             });
         }, 100);
     }

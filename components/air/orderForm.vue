@@ -206,7 +206,16 @@ export default {
                     Authorization: `Bearer ${this.$store.state.user.userInfo.token}`
                 }
             }).then(res => {
-                console.log(res)
+
+                this.$message.success("正在生成订单，请稍后...");
+                
+                const {id} = res.data.data;
+                this.$router.push({
+                    path: "/air/pay",
+                    query: {
+                        id
+                    }
+                })
             })
         }
     },
